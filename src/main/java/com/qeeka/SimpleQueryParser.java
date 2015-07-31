@@ -1,7 +1,6 @@
 package com.qeeka;
 
 import java.util.Queue;
-import java.util.Stack;
 
 /**
  * Created by neal.xu on 7/31 0031.
@@ -17,11 +16,11 @@ public class SimpleQueryParser {
         QueryOperateNode operateNode;
         while (!nodeStack.isEmpty()) {
             QueryHandle queryHandle = nodeStack.remove();
-            if(queryHandle instanceof QueryNode){
+            if (queryHandle instanceof QueryNode) {
 
             }
 
-            if(queryHandle instanceof  QueryOperateNode){
+            if (queryHandle instanceof QueryOperateNode) {
 
             }
 
