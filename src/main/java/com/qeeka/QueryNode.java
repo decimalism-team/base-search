@@ -5,10 +5,22 @@ import com.qeeka.operate.QuerySpecialOperate;
 /**
  * Created by neal.xu on 7/31 0031.
  */
-public class QueryNode implements QueryHandle{
+public class QueryNode extends QueryHandle {
+    static String format = "%s %s :%s";
     private String columnName;
-    private String value;
+    private Object value;
     private QuerySpecialOperate querySpecialOperate = QuerySpecialOperate.EQUALS;
+
+    public QueryNode(String columnName, Object value) {
+        this.columnName = columnName;
+        this.value = value;
+    }
+
+    public QueryNode(Object value, String columnName, QuerySpecialOperate querySpecialOperate) {
+        this.value = value;
+        this.columnName = columnName;
+        this.querySpecialOperate = querySpecialOperate;
+    }
 
     public String getColumnName() {
         return columnName;
@@ -18,11 +30,11 @@ public class QueryNode implements QueryHandle{
         this.columnName = columnName;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -33,4 +45,9 @@ public class QueryNode implements QueryHandle{
     public void setQuerySpecialOperate(QuerySpecialOperate querySpecialOperate) {
         this.querySpecialOperate = querySpecialOperate;
     }
+
+    public String generateHql() {
+        return String.format(format, columnName, querySpecialOperate.getValue(), columnName);
+    }
+
 }
