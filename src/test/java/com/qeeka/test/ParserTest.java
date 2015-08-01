@@ -3,17 +3,24 @@ package com.qeeka.test;
 import com.qeeka.QueryGroup;
 import com.qeeka.QueryNode;
 import com.qeeka.SimpleQueryParser;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Created by neal.xu on 7/31 0031.
  */
 public class ParserTest {
+    SimpleQueryParser parser;
+
+    @Before
+    public void init() {
+        parser = new SimpleQueryParser();
+    }
+
     @Test
     public void test1() {
         // a=1 and b=2 and c=3
         QueryGroup group = new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2));
-        SimpleQueryParser parser = new SimpleQueryParser();
         System.out.println(parser.parse(group));
     }
 
@@ -24,7 +31,6 @@ public class ParserTest {
                 and(
                         new QueryGroup(new QueryNode("c", 3)).and(new QueryNode("a", 1)).and(new QueryNode("b", 2))
                 );
-        SimpleQueryParser parser = new SimpleQueryParser();
         System.out.println(parser.parse(group));
     }
 
@@ -34,7 +40,17 @@ public class ParserTest {
         QueryGroup group = new QueryGroup("c", 5).or(
                 new QueryGroup("a", 3).and("b", 4).or("f", 9)
         );
-        SimpleQueryParser parser = new SimpleQueryParser();
+        System.out.println(parser.parse(group));
+    }
+
+    @Test
+    public void test4() {
+        // (a=3 and b=4) or (c=3 or d=5)
+        QueryGroup group = new QueryGroup(
+                new QueryGroup("a", 3).and("b", 4)
+        ).or(
+                new QueryGroup("c", 3).or("d", 5)
+        );
         System.out.println(parser.parse(group));
     }
 }

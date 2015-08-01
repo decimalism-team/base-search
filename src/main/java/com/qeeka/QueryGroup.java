@@ -3,6 +3,7 @@ package com.qeeka;
 import com.qeeka.operate.QueryOperate;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -10,10 +11,16 @@ import java.util.List;
  */
 public class QueryGroup {
 
-    private List<QueryHandle> queryHandleList = new ArrayList<QueryHandle>();
+    private List<QueryHandle> queryHandleList = new LinkedList<QueryHandle>();
 
     public QueryGroup(QueryNode node) {
         queryHandleList.add(node);
+    }
+
+    public QueryGroup(QueryGroup group){
+        for (QueryHandle handle : group.getQueryHandleList()) {
+            queryHandleList.add(handle);
+        }
     }
 
     public QueryGroup(String columnName, Object value) {

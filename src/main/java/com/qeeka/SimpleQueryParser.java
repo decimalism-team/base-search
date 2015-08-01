@@ -1,6 +1,7 @@
 package com.qeeka;
 
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by neal.xu on 7/31 0031.
@@ -13,41 +14,64 @@ public class SimpleQueryParser {
             throw new IllegalArgumentException("Can't parse query!");
         }
 
-        StringBuilder whereHql = new StringBuilder();
+        Stack<CharSequence> hqlParts = new Stack<CharSequence>();
 
-        QueryOperateNode operateNode;
-        boolean beginParse = false;
+        QueryHandle node1 = null;
+        QueryHandle node2 = null;
 
-        for (int i = 0; i < nodeStack.size(); ) {
+        int lastScanIndex = 0;
+
+        int i = 0;
+        while (!nodeStack.isEmpty()) {
             QueryHandle currentNode = nodeStack.get(i);
             if (currentNode instanceof QueryOperateNode) {
-                operateNode = (QueryOperateNode) currentNode;
-                QueryHandle preNode = nodeStack.get(i - 1);
-                if (!beginParse) {
-                    QueryHandle prePreNode = nodeStack.get(i - 2);
-                    whereHql.append('(')
-                            .append(prePreNode.generateHql()).append(operateNode.getQueryOperate().getValue())
-                            .append(preNode.generateHql())
-                            .append(')');
+                QueryOperateNode operateNode = (QueryOperateNode) currentNode;
+
+                if (i - 2 >= 0) {
+                    node2 = nodeStack.get(i - 2);
+                }
+                if (i - 1 >= 0) {
+                    node1 = nodeStack.get(i - 1);
+                }
+
+                //when express like a b +
+                if (lastScanIndex <= i - 2 && node1 instanceof QueryNode && node2 instanceof QueryNode) {
+                    hqlParts.push(new StringBuilder().append('(')
+                            .append(node2.generateHql()).append(operateNode.getQueryOperate().getValue())
+                            .append(node1.generateHql())
+                            .append(')'));
+                    //remove handle node
+                    nodeStack.remove(i--);
+                    nodeStack.remove(i--);
                     nodeStack.remove(i);
-                    nodeStack.remove(i - 1);
-                    nodeStack.remove(i - 2);
-                    i = i - 2;
-                    beginParse = true;
+                    lastScanIndex = i;
                 } else {
-                    whereHql.insert(0, '(')
-                            .append(operateNode.getQueryOperate().getValue())
-                            .append(preNode.generateHql())
-                            .append(')');
-                    nodeStack.remove(i);
-                    nodeStack.remove(i - 1);
-                    i = i - 1;
+                    CharSequence popNode = hqlParts.pop();
+
+                    if (!hqlParts.isEmpty()) {
+                        CharSequence popNode2 = hqlParts.pop();
+                        hqlParts.push(
+                                new StringBuilder().append('(').append(popNode2)
+                                        .append(operateNode.getQueryOperate().getValue())
+                                        .append(popNode).append(')')
+                        );
+                        //remove operate node
+                        nodeStack.remove(i--);
+                    } else {
+                        hqlParts.push(
+                                new StringBuilder('(').append('(').append(node1.generateHql())
+                                        .append(operateNode.getQueryOperate().getValue())
+                                        .append(popNode).append(')').append(')')
+                        );
+                        //remove operate node and query node
+                        nodeStack.remove(i--);
+                        nodeStack.remove(i);
+                    }
                 }
             } else {
                 i++;
             }
         }
-
-        return whereHql.toString();
+        return hqlParts.pop().toString();
     }
 }

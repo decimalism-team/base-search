@@ -46,8 +46,8 @@ public class QueryNode extends QueryHandle {
         this.querySpecialOperate = querySpecialOperate;
     }
 
-    public String generateHql() {
-        return String.format(format, columnName, querySpecialOperate.getValue(), columnName);
+    public StringBuilder generateHql() {
+        return new StringBuilder(String.format(format, columnName, querySpecialOperate.getValue(), columnName));
     }
 
 }
