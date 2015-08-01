@@ -2,7 +2,7 @@
 
 you can generate hql by QueryGroup 
 
-simple
+#simple
 
 new QueryGroup("a", 1).and("b", 2) ==> (a = :a0 AND b = :b1)
 
