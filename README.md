@@ -3,15 +3,17 @@
 you can generate hql by QueryGroup 
 
 #simple
-
+```java
 new QueryGroup("a", 1).and("b", 2) ==> (a = :a0 AND b = :b1)
-
+```
+```java
 new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3) ==>(c = :c2 AND (a = :a0 AND b = :b1)))
-
+```
 
 #multi sample parameters generate
+```java
 new QueryGroup("a", 30).and("b", 10).or("a", 20)  ==>  (a = :a2 OR (a = :a0 AND b = :b1)))
-
+```
 
 #You can't get hql or parameters with SimpleQuery
 ```java
