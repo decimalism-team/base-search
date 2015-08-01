@@ -1,4 +1,4 @@
-# Easy generate hql Statement
+# Easy generate hql Statement in one domain
 
 You can generate hql by QueryGroup 
 
