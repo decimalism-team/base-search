@@ -27,3 +27,8 @@ Assert.assertEquals(simpleQuery.getParameters().get("a0"), 30);
 Assert.assertEquals(simpleQuery.getParameters().get("b1"), 10);
 Assert.assertEquals(simpleQuery.getParameters().get("a2"), 20);
 ```
+#Json transaction
+```java
+String s = QueryJSONBinder.binder(QueryGroup.class).toJSON(group);
+QueryGroup queryGroup = QueryJSONBinder.binder(QueryGroup.class).fromJSON(s);
+```
