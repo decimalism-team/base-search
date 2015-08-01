@@ -17,7 +17,7 @@ new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3)
 new QueryGroup("a", 30).and("b", 10).or("a", 20)  ==>  (a = :a2 OR (a = :a0 AND b = :b1)))
 ```
 
-#You can get hql or parameters with SimpleQuery
+#You can get hql and parameters with SimpleQuery
 ```java
 QueryGroup group = new QueryGroup("a", 30).and("b", 10).or("a", 20);
 SimpleQuery simpleQuery = parser.parse(group);
