@@ -1,6 +1,6 @@
 package com.qeeka;
 
-import com.qeeka.operate.QuerySpecialOperate;
+import com.qeeka.operate.QueryOperate;
 
 /**
  * Created by neal.xu on 7/31 0031.
@@ -9,14 +9,14 @@ public class QueryNode extends QueryHandle {
     static String format = "%s %s :%s";
     private String columnName;
     private Object value;
-    private QuerySpecialOperate querySpecialOperate = QuerySpecialOperate.EQUALS;
+    private QueryOperate querySpecialOperate = QueryOperate.EQUALS;
 
     public QueryNode(String columnName, Object value) {
         this.columnName = columnName;
         this.value = value;
     }
 
-    public QueryNode(Object value, String columnName, QuerySpecialOperate querySpecialOperate) {
+    public QueryNode(String columnName, Object value, QueryOperate querySpecialOperate) {
         this.value = value;
         this.columnName = columnName;
         this.querySpecialOperate = querySpecialOperate;
@@ -38,16 +38,11 @@ public class QueryNode extends QueryHandle {
         this.value = value;
     }
 
-    public QuerySpecialOperate getQuerySpecialOperate() {
+    public QueryOperate getQuerySpecialOperate() {
         return querySpecialOperate;
     }
 
-    public void setQuerySpecialOperate(QuerySpecialOperate querySpecialOperate) {
+    public void setQuerySpecialOperate(QueryOperate querySpecialOperate) {
         this.querySpecialOperate = querySpecialOperate;
     }
-
-    public StringBuilder generateHql() {
-        return new StringBuilder(String.format(format, columnName, querySpecialOperate.getValue(), columnName));
-    }
-
 }

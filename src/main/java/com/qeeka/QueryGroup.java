@@ -1,10 +1,11 @@
 package com.qeeka;
 
-import com.qeeka.operate.QueryOperate;
+import com.qeeka.operate.QueryLinkOperate;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by neal.xu on 7/31 0031.
@@ -12,6 +13,7 @@ import java.util.List;
 public class QueryGroup {
 
     private List<QueryHandle> queryHandleList = new LinkedList<QueryHandle>();
+    private Map<String,Object> queryParamesMap = new HashMap<String, Object>();
 
     public QueryGroup(QueryNode node) {
         queryHandleList.add(node);
@@ -30,25 +32,25 @@ public class QueryGroup {
 
     public QueryGroup and(QueryNode node) {
         queryHandleList.add(node);
-        queryHandleList.add(new QueryOperateNode(QueryOperate.AND));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
     public QueryGroup and(String columnName, Object value) {
         queryHandleList.add(new QueryNode(columnName, value));
-        queryHandleList.add(new QueryOperateNode(QueryOperate.AND));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
     public QueryGroup or(QueryNode node) {
         queryHandleList.add(node);
-        queryHandleList.add(new QueryOperateNode(QueryOperate.OR));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
         return this;
     }
 
     public QueryGroup or(String columnName, Object value) {
         queryHandleList.add(new QueryNode(columnName, value));
-        queryHandleList.add(new QueryOperateNode(QueryOperate.OR));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
         return this;
     }
 
@@ -56,7 +58,7 @@ public class QueryGroup {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
-        queryHandleList.add(new QueryOperateNode(QueryOperate.AND));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
@@ -64,7 +66,7 @@ public class QueryGroup {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
-        queryHandleList.add(new QueryOperateNode(QueryOperate.OR));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
         return this;
     }
 

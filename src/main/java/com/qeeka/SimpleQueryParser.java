@@ -1,18 +1,24 @@
 package com.qeeka;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 /**
  * Created by neal.xu on 7/31 0031.
  */
 public class SimpleQueryParser {
-    public String parse(QueryGroup group) {
+    private static final String COLUMN_FORMAT = "%s %s :%s";
+
+
+    public SimpleQuery parse(QueryGroup group) {
         List<QueryHandle> nodeStack = group.getQueryHandleList();
 
         if (nodeStack == null || nodeStack.isEmpty()) {
             throw new IllegalArgumentException("Can't parse query!");
         }
+
+        SimpleQuery simpleQuery = new SimpleQuery();
 
         Stack<CharSequence> hqlParts = new Stack<CharSequence>();
 
@@ -21,30 +27,30 @@ public class SimpleQueryParser {
 
         int lastScanIndex = 0;
 
-        int i = 0;
+        int index = 0;
         while (!nodeStack.isEmpty()) {
-            QueryHandle currentNode = nodeStack.get(i);
+            QueryHandle currentNode = nodeStack.get(index);
             if (currentNode instanceof QueryOperateNode) {
                 QueryOperateNode operateNode = (QueryOperateNode) currentNode;
 
-                if (i - 2 >= 0) {
-                    node2 = nodeStack.get(i - 2);
+                if (index - 2 >= 0) {
+                    node2 = nodeStack.get(index - 2);
                 }
-                if (i - 1 >= 0) {
-                    node1 = nodeStack.get(i - 1);
+                if (index - 1 >= 0) {
+                    node1 = nodeStack.get(index - 1);
                 }
 
                 //when express like a b +
-                if (lastScanIndex <= i - 2 && node1 instanceof QueryNode && node2 instanceof QueryNode) {
+                if (lastScanIndex <= index - 2 && node1 instanceof QueryNode && node2 instanceof QueryNode) {
                     hqlParts.push(new StringBuilder().append('(')
-                            .append(node2.generateHql()).append(operateNode.getQueryOperate().getValue())
-                            .append(node1.generateHql())
+                            .append(generateParameterHql(node2, simpleQuery.getParameters())).append(operateNode.getQueryOperate().getValue())
+                            .append(generateParameterHql(node1, simpleQuery.getParameters()))
                             .append(')'));
                     //remove handle node
-                    nodeStack.remove(i--);
-                    nodeStack.remove(i--);
-                    nodeStack.remove(i);
-                    lastScanIndex = i;
+                    nodeStack.remove(index--);
+                    nodeStack.remove(index--);
+                    nodeStack.remove(index);
+                    lastScanIndex = index;
                 } else {
                     CharSequence popNode = hqlParts.pop();
 
@@ -56,22 +62,33 @@ public class SimpleQueryParser {
                                         .append(popNode).append(')')
                         );
                         //remove operate node
-                        nodeStack.remove(i--);
+                        nodeStack.remove(index--);
                     } else {
                         hqlParts.push(
-                                new StringBuilder('(').append('(').append(node1.generateHql())
+                                new StringBuilder('(').append('(').append(generateParameterHql(node1, simpleQuery.getParameters()))
                                         .append(operateNode.getQueryOperate().getValue())
                                         .append(popNode).append(')').append(')')
                         );
                         //remove operate node and query node
-                        nodeStack.remove(i--);
-                        nodeStack.remove(i);
+                        nodeStack.remove(index--);
+                        nodeStack.remove(index);
                     }
                 }
             } else {
-                i++;
+                index++;
             }
         }
-        return hqlParts.pop().toString();
+        simpleQuery.setHql(hqlParts.pop().toString());
+        return simpleQuery;
+    }
+
+    private static String generateParameterHql(QueryHandle handle, Map<String, Object> parameters) {
+        if (handle instanceof QueryNode) {
+            QueryNode node = (QueryNode) handle;
+            String tempParameterName = new StringBuilder(node.getColumnName()).append(parameters.size()).toString();
+            parameters.put(tempParameterName, node.getValue());
+            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQuerySpecialOperate().getValue(), tempParameterName);
+        }
+        return "";
     }
 }

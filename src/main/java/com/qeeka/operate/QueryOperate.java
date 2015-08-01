@@ -4,7 +4,8 @@ package com.qeeka.operate;
  * Created by neal.xu on 7/29 0029.
  */
 public enum QueryOperate {
-    AND(" AND "), OR(" OR ");
+    EQUALS("="), NO_EQUALS("<>"), LIKE("like"), NOT_LIKE("no like");
+
     private String value;
 
     QueryOperate(String value) {
