@@ -4,7 +4,8 @@ you can generate hql by QueryGroup
 
 #simple
 ```java
-new QueryGroup("a", 1).and("b", 2) ==> (a = :a0 AND b = :b1)
+new QueryGroup("a", 1).and("b", 2) 
+==> (a = :a0 AND b = :b1)
 ```
 ```java
 new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3) 
