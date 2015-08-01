@@ -7,7 +7,8 @@ you can generate hql by QueryGroup
 new QueryGroup("a", 1).and("b", 2) ==> (a = :a0 AND b = :b1)
 ```
 ```java
-new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3) ==>(c = :c2 AND (a = :a0 AND b = :b1)))
+new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3) 
+==>(c = :c2 AND (a = :a0 AND b = :b1)))
 ```
 
 #multi sample parameters generate
