@@ -2,10 +2,8 @@ package com.qeeka;
 
 import com.qeeka.operate.QueryLinkOperate;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by neal.xu on 7/31 0031.
@@ -13,13 +11,12 @@ import java.util.Map;
 public class QueryGroup {
 
     private List<QueryHandle> queryHandleList = new LinkedList<QueryHandle>();
-    private Map<String,Object> queryParamesMap = new HashMap<String, Object>();
 
     public QueryGroup(QueryNode node) {
         queryHandleList.add(node);
     }
 
-    public QueryGroup(QueryGroup group){
+    public QueryGroup(QueryGroup group) {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
