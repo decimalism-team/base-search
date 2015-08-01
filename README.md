@@ -1,18 +1,19 @@
 # easy generate hql Statement
 
-you can generate hql by QueryGroup:
+you can generate hql by QueryGroup 
 
---simple
+simple
+
 new QueryGroup("a", 1).and("b", 2) ==> (a = :a0 AND b = :b1)
 
 new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3) ==>(c = :c2 AND (a = :a0 AND b = :b1)))
 
 
---multi sample parameters generate
+#multi sample parameters generate
 new QueryGroup("a", 30).and("b", 10).or("a", 20)  ==>  (a = :a2 OR (a = :a0 AND b = :b1)))
 
 
---You can't get hql or parameters with SimpleQuery
+#You can't get hql or parameters with SimpleQuery
 QueryGroup group = new QueryGroup("a", 30).and("b", 10).or("a", 20);
 SimpleQuery simpleQuery = parser.parse(group);
 Assert.assertEquals(simpleQuery.getHql(), "(a = :a2 OR (a = :a0 AND b = :b1)))");
