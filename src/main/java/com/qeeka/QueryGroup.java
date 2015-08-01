@@ -1,5 +1,7 @@
 package com.qeeka;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.qeeka.deserializer.QueryGroupJsonDeserializer;
 import com.qeeka.operate.QueryLinkOperate;
 
 import java.util.LinkedList;
@@ -8,9 +10,13 @@ import java.util.List;
 /**
  * Created by neal.xu on 7/31 0031.
  */
+@JsonDeserialize(using = QueryGroupJsonDeserializer.class)
 public class QueryGroup {
 
-    private List<QueryHandle> queryHandleList = new LinkedList<QueryHandle>();
+    private List<QueryHandle> queryHandleList = new LinkedList<>();
+
+    public QueryGroup() {
+    }
 
     public QueryGroup(QueryNode node) {
         queryHandleList.add(node);

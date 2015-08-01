@@ -2,19 +2,19 @@ package com.qeeka;
 
 import com.qeeka.operate.QueryLinkOperate;
 
-class QueryOperateNode extends QueryHandle {
+public class QueryOperateNode extends QueryHandle {
 
-    private QueryLinkOperate queryOperate = QueryLinkOperate.AND;
+    private QueryLinkOperate queryLinkOperate = QueryLinkOperate.AND;
 
-    public QueryOperateNode(QueryLinkOperate queryOperate) {
-        this.queryOperate = queryOperate;
+    public QueryOperateNode(QueryLinkOperate queryLinkOperate) {
+        this.queryLinkOperate = queryLinkOperate;
     }
 
-    public QueryLinkOperate getQueryOperate() {
-        return queryOperate;
+    public QueryLinkOperate getQueryLinkOperate() {
+        return queryLinkOperate;
     }
 
-    public void setQueryOperate(QueryLinkOperate queryOperate) {
-        this.queryOperate = queryOperate;
+    public void setQueryLinkOperate(QueryLinkOperate queryLinkOperate) {
+        this.queryLinkOperate = queryLinkOperate;
     }
 }

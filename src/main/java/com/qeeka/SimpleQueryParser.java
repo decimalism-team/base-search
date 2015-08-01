@@ -43,7 +43,7 @@ public class SimpleQueryParser {
                 //when express like a b +
                 if (lastScanIndex <= index - 2 && node1 instanceof QueryNode && node2 instanceof QueryNode) {
                     hqlParts.push(new StringBuilder().append('(')
-                            .append(generateParameterHql(node2, simpleQuery.getParameters())).append(operateNode.getQueryOperate().getValue())
+                            .append(generateParameterHql(node2, simpleQuery.getParameters())).append(operateNode.getQueryLinkOperate().getValue())
                             .append(generateParameterHql(node1, simpleQuery.getParameters()))
                             .append(')'));
                     //remove handle node
@@ -58,7 +58,7 @@ public class SimpleQueryParser {
                         CharSequence popNode2 = hqlParts.pop();
                         hqlParts.push(
                                 new StringBuilder().append('(').append(popNode2)
-                                        .append(operateNode.getQueryOperate().getValue())
+                                        .append(operateNode.getQueryLinkOperate().getValue())
                                         .append(popNode).append(')')
                         );
                         //remove operate node
@@ -66,7 +66,7 @@ public class SimpleQueryParser {
                     } else {
                         hqlParts.push(
                                 new StringBuilder('(').append('(').append(generateParameterHql(node1, simpleQuery.getParameters()))
-                                        .append(operateNode.getQueryOperate().getValue())
+                                        .append(operateNode.getQueryLinkOperate().getValue())
                                         .append(popNode).append(')').append(')')
                         );
                         //remove operate node and query node
@@ -87,7 +87,7 @@ public class SimpleQueryParser {
             QueryNode node = (QueryNode) handle;
             String tempParameterName = new StringBuilder(node.getColumnName()).append(parameters.size()).toString();
             parameters.put(tempParameterName, node.getValue());
-            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQuerySpecialOperate().getValue(), tempParameterName);
+            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQueryOperate().getValue(), tempParameterName);
         }
         return "";
     }

@@ -6,20 +6,19 @@ import com.qeeka.operate.QueryOperate;
  * Created by neal.xu on 7/31 0031.
  */
 public class QueryNode extends QueryHandle {
-    static String format = "%s %s :%s";
     private String columnName;
     private Object value;
-    private QueryOperate querySpecialOperate = QueryOperate.EQUALS;
+    private QueryOperate queryOperate = QueryOperate.EQUALS;
 
     public QueryNode(String columnName, Object value) {
         this.columnName = columnName;
         this.value = value;
     }
 
-    public QueryNode(String columnName, Object value, QueryOperate querySpecialOperate) {
+    public QueryNode(String columnName, Object value, QueryOperate queryOperate) {
         this.value = value;
         this.columnName = columnName;
-        this.querySpecialOperate = querySpecialOperate;
+        this.queryOperate = queryOperate;
     }
 
     public String getColumnName() {
@@ -38,11 +37,11 @@ public class QueryNode extends QueryHandle {
         this.value = value;
     }
 
-    public QueryOperate getQuerySpecialOperate() {
-        return querySpecialOperate;
+    public QueryOperate getQueryOperate() {
+        return queryOperate;
     }
 
-    public void setQuerySpecialOperate(QueryOperate querySpecialOperate) {
-        this.querySpecialOperate = querySpecialOperate;
+    public void setQueryOperate(QueryOperate queryOperate) {
+        this.queryOperate = queryOperate;
     }
 }

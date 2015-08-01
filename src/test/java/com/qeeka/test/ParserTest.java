@@ -5,6 +5,7 @@ import com.qeeka.QueryNode;
 import com.qeeka.SimpleQuery;
 import com.qeeka.SimpleQueryParser;
 import com.qeeka.operate.QueryOperate;
+import com.qeeka.util.QueryJSONBinder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,5 +75,18 @@ public class ParserTest {
         Assert.assertEquals(simpleQuery.getParameters().get("a0"), 30);
         Assert.assertEquals(simpleQuery.getParameters().get("b1"), 10);
         Assert.assertEquals(simpleQuery.getParameters().get("a2"), 20);
+    }
+
+    @Test
+    public void testJsonTransaction() {
+        QueryGroup group = new QueryGroup(
+                new QueryGroup("a", 3).and("b", 4)
+        ).or(
+                new QueryGroup("c", 3).or("d", 5)
+        );
+
+        String s = QueryJSONBinder.binder(QueryGroup.class).toJSON(group);
+        QueryGroup queryGroup = QueryJSONBinder.binder(QueryGroup.class).fromJSON(s);
+        Assert.assertEquals(parser.parse(queryGroup).getHql(), "((a = :a0 AND b = :b1) OR (c = :c2 OR d = :d3))");
     }
 }
