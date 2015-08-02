@@ -3,6 +3,7 @@ package com.qeeka;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.qeeka.deserializer.QueryGroupJsonDeserializer;
 import com.qeeka.operate.QueryLinkOperate;
+import com.qeeka.operate.QueryResultType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class QueryGroup {
 
     private List<QueryHandle> queryHandleList = new LinkedList<>();
+    private QueryResultType queryResultType = QueryResultType.LIST;
 
     public QueryGroup() {
     }
@@ -75,5 +77,17 @@ public class QueryGroup {
 
     public List<QueryHandle> getQueryHandleList() {
         return queryHandleList;
+    }
+
+    public void setQueryHandleList(List<QueryHandle> queryHandleList) {
+        this.queryHandleList = queryHandleList;
+    }
+
+    public QueryResultType getQueryResultType() {
+        return queryResultType;
+    }
+
+    public void setQueryResultType(QueryResultType queryResultType) {
+        this.queryResultType = queryResultType;
     }
 }
