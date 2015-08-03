@@ -23,8 +23,8 @@ public class ParserTest {
 
     @Test
     public void sampleTest() {
-        QueryGroup group = new QueryGroup("a", 1).and("b", 2);
-        Assert.assertEquals(parser.parse(group).getHql(), "(a = :a0 AND b = :b1)");
+        QueryGroup group = new QueryGroup("a", 1).and("b", 2).or("c", 3);
+        Assert.assertEquals(parser.parse(group).getHql(), "(c = :c2 OR (a = :a0 AND b = :b1)))");
     }
 
     @Test
