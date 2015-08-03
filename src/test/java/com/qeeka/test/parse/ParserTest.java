@@ -1,4 +1,4 @@
-package com.qeeka.test;
+package com.qeeka.test.parse;
 
 import com.qeeka.QueryGroup;
 import com.qeeka.QueryNode;
