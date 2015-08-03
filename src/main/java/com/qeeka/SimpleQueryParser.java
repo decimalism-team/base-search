@@ -20,7 +20,7 @@ public class SimpleQueryParser {
 
         SimpleQuery simpleQuery = new SimpleQuery();
 
-        Stack<CharSequence> hqlParts = new Stack<CharSequence>();
+        Stack<CharSequence> hqlParts = new Stack<>();
 
         QueryHandle node1 = null;
         QueryHandle node2 = null;
