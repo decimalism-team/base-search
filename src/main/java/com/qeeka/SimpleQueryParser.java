@@ -87,7 +87,7 @@ public class SimpleQueryParser {
             QueryNode node = (QueryNode) handle;
             String tempParameterName = new StringBuilder(node.getColumnName()).append(parameters.size()).toString();
             parameters.put(tempParameterName, node.getValue());
-            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQueryOperate().getValue(), tempParameterName);
+            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQueryOperate(), tempParameterName);
         }
         return "";
     }
