@@ -2,8 +2,7 @@ package com.qeeka.test.person;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.qeeka.QueryGroup;
-import com.qeeka.SimpleQuery;
-import com.qeeka.SimpleQueryParser;
+import com.qeeka.operate.QueryOperate;
 import com.qeeka.test.SpringTestWithDB;
 import com.qeeka.test.domain.Person;
 import com.qeeka.test.service.PersonService;
@@ -22,8 +21,6 @@ public class PersonTest extends SpringTestWithDB {
 
     @Autowired
     private PersonService personService;
-    @Autowired
-    private SimpleQueryParser queryParser;
 
     @Test
     @DatabaseSetup("/PersonData.xml")
@@ -35,9 +32,8 @@ public class PersonTest extends SpringTestWithDB {
     @Test
     @DatabaseSetup("/PersonData.xml")
     public void testSearch() {
-        QueryGroup group = new QueryGroup("name", "neal1").or("status", 1).and("type", 1);
-        SimpleQuery query = queryParser.parse(group);
-        List<Person> result = personService.search(query);
+        QueryGroup group = new QueryGroup("name", "%n%",QueryOperate.LIKE).and("type", 1).and("name", "name", QueryOperate.COLUMN_COMPARE);
+        List<Person> result = personService.search(group);
         for (Person person : result) {
             System.out.println(QueryJSONBinder.binder(Person.class).toJSON(person));
         }

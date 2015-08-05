@@ -85,9 +85,31 @@ public class SimpleQueryParser {
     private static String generateParameterHql(QueryHandle handle, Map<String, Object> parameters) {
         if (handle instanceof QueryNode) {
             QueryNode node = (QueryNode) handle;
-            String tempParameterName = new StringBuilder(node.getColumnName()).append(parameters.size()).toString();
-            parameters.put(tempParameterName, node.getValue());
-            return String.format(COLUMN_FORMAT, node.getColumnName(), node.getQueryOperate(), tempParameterName);
+
+            StringBuilder queryPart = new StringBuilder(node.getColumnName()).append(node.getQueryOperate().getValue());
+            StringBuilder parameterName = new StringBuilder(node.getColumnName()).append(parameters.size());
+
+            switch (node.getQueryOperate()) {
+                case IS_NULL:
+                    queryPart.append(" IS NULL ");
+                    parameterName = null;
+                    break;
+                case IS_NOT_NULL:
+                    queryPart.append(" IS NOT NULL ");
+                    parameterName = null;
+                    break;
+                case COLUMN_COMPARE:
+                    queryPart.append(" = ").append(node.getValue());
+                    parameterName = null;
+                    break;
+                default:
+                    queryPart.append(":").append(parameterName);
+            }
+
+            if (parameterName != null) {
+                parameters.put(parameterName.toString(), node.getValue());
+            }
+            return queryPart.toString();
         }
         return "";
     }

@@ -1,6 +1,7 @@
 package com.qeeka.test.service;
 
-import com.qeeka.SimpleQuery;
+import com.qeeka.QueryGroup;
+import com.qeeka.SimpleQueryParser;
 import com.qeeka.test.domain.Person;
 import com.qeeka.test.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class PersonService {
     @Autowired
     private PersonRepository repository;
 
+    @Autowired
+    private SimpleQueryParser queryParser;
+
 
     public void remove(int personId) {
         Person person = entityManager.find(Person.class, personId);
@@ -30,7 +34,7 @@ public class PersonService {
     }
 
 
-    public List<Person> search(SimpleQuery query) {
-        return repository.search(query);
+    public List<Person> search(QueryGroup group) {
+        return repository.search(queryParser.parse(group));
     }
 }

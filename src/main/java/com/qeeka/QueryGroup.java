@@ -3,6 +3,7 @@ package com.qeeka;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.qeeka.deserializer.QueryGroupJsonDeserializer;
 import com.qeeka.operate.QueryLinkOperate;
+import com.qeeka.operate.QueryOperate;
 import com.qeeka.operate.QueryOrder;
 import com.qeeka.operate.QueryResultType;
 
@@ -36,6 +37,10 @@ public class QueryGroup {
         queryHandleList.add(new QueryNode(columnName, value));
     }
 
+    public QueryGroup(String columnName, Object value, QueryOperate queryOperate) {
+        queryHandleList.add(new QueryNode(columnName, value, queryOperate));
+    }
+
 
     public QueryGroup and(QueryNode node) {
         queryHandleList.add(node);
@@ -49,6 +54,12 @@ public class QueryGroup {
         return this;
     }
 
+    public QueryGroup and(String columnName, Object value, QueryOperate queryOperate) {
+        queryHandleList.add(new QueryNode(columnName, value, queryOperate));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
+        return this;
+    }
+
     public QueryGroup or(QueryNode node) {
         queryHandleList.add(node);
         queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
@@ -57,6 +68,12 @@ public class QueryGroup {
 
     public QueryGroup or(String columnName, Object value) {
         queryHandleList.add(new QueryNode(columnName, value));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
+        return this;
+    }
+
+    public QueryGroup or(String columnName, Object value, QueryOperate queryOperate) {
+        queryHandleList.add(new QueryNode(columnName, value, queryOperate));
         queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
         return this;
     }
