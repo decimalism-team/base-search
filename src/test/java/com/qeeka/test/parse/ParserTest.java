@@ -36,7 +36,7 @@ public class ParserTest {
     @Test
     public void testLike() {
         QueryGroup group = new QueryGroup(new QueryNode("a", 1, QueryOperate.LIKE)).and(new QueryNode("b", 2, QueryOperate.NO_EQUALS));
-        Assert.assertEquals(parser.parse(group).getHql(), "(a like :a0 AND b <> :b1)");
+        Assert.assertEquals(parser.parse(group).getHql(), "(a LIKE :a0 AND b <> :b1)");
     }
 
     @Test

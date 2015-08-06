@@ -6,7 +6,7 @@ import com.qeeka.operate.QueryOperate;
 import com.qeeka.test.SpringTestWithDB;
 import com.qeeka.test.domain.Person;
 import com.qeeka.test.service.PersonService;
-import com.qeeka.util.QueryJSONBinder;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +32,11 @@ public class PersonTest extends SpringTestWithDB {
     @Test
     @DatabaseSetup("/PersonData.xml")
     public void testSearch() {
-        QueryGroup group = new QueryGroup("name", "%n%",QueryOperate.LIKE).and("type", 1).and("name", "name", QueryOperate.COLUMN_COMPARE);
+        QueryGroup group = new QueryGroup("name", "%n%", QueryOperate.LIKE)
+                .and("type", 1).and("status", "type", QueryOperate.COLUMN_EQUALS)
+                .and("password", "p1");
         List<Person> result = personService.search(group);
-        for (Person person : result) {
-            System.out.println(QueryJSONBinder.binder(Person.class).toJSON(person));
-        }
+        Assert.assertTrue(result.get(0).getId() == 0);
 
     }
 

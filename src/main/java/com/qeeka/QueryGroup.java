@@ -16,68 +16,120 @@ import java.util.List;
 @JsonDeserialize(using = QueryGroupJsonDeserializer.class)
 public class QueryGroup {
 
+    /**
+     * query handle node list
+     */
     private List<QueryHandle> queryHandleList = new LinkedList<>();
+    /**
+     * query result type : List or Unique
+     */
     private QueryResultType queryResultType = QueryResultType.LIST;
+    /**
+     * query sort column
+     */
     private List<QuerySort> sortList = new LinkedList<>();
 
     public QueryGroup() {
     }
 
+    /**
+     * add query node
+     *
+     * @param node
+     */
     public QueryGroup(QueryNode node) {
         queryHandleList.add(node);
     }
 
+    /**
+     * add query group
+     *
+     * @param group
+     */
     public QueryGroup(QueryGroup group) {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
     }
 
+    /**
+     * add node by parameters
+     *
+     * @param columnName column name
+     * @param value      value
+     */
     public QueryGroup(String columnName, Object value) {
         queryHandleList.add(new QueryNode(columnName, value));
     }
 
+    /**
+     * add node with parameters and query operate
+     *
+     * @param columnName   column name
+     * @param value        value
+     * @param queryOperate query operate
+     */
     public QueryGroup(String columnName, Object value, QueryOperate queryOperate) {
         queryHandleList.add(new QueryNode(columnName, value, queryOperate));
     }
 
+    /**
+     * Null Logic
+     *
+     * @param columnName
+     */
+    public QueryGroup(String columnName, QueryOperate queryOperate) {
+        if (!queryOperate.equals(QueryOperate.IS_NULL) && !queryOperate.equals(QueryOperate.IS_NOT_NULL)) {
+            throw new IllegalArgumentException("Constructor only support null reject logic!");
+        }
+        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+    }
 
+    /**
+     * and with query node
+     *
+     * @param node
+     * @return
+     */
     public QueryGroup and(QueryNode node) {
         queryHandleList.add(node);
         queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
+    /**
+     * and with parameters and default operate `and`
+     *
+     * @param columnName column name
+     * @param value      value
+     * @return
+     */
     public QueryGroup and(String columnName, Object value) {
         queryHandleList.add(new QueryNode(columnName, value));
         queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
+    /**
+     * and with parameters and operate
+     *
+     * @param columnName   column name
+     * @param value        value
+     * @param queryOperate query operate
+     * @return
+     */
     public QueryGroup and(String columnName, Object value, QueryOperate queryOperate) {
         queryHandleList.add(new QueryNode(columnName, value, queryOperate));
         queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
-    public QueryGroup or(QueryNode node) {
-        queryHandleList.add(node);
-        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
-        return this;
-    }
-
-    public QueryGroup or(String columnName, Object value) {
-        queryHandleList.add(new QueryNode(columnName, value));
-        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
-        return this;
-    }
-
-    public QueryGroup or(String columnName, Object value, QueryOperate queryOperate) {
-        queryHandleList.add(new QueryNode(columnName, value, queryOperate));
-        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
-        return this;
-    }
-
+    /**
+     * and with query group
+     *
+     * @param group query group
+     * @return
+     */
     public QueryGroup and(QueryGroup group) {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
@@ -86,6 +138,80 @@ public class QueryGroup {
         return this;
     }
 
+    /**
+     * null query node
+     *
+     * @param columnName
+     */
+    public QueryGroup and(String columnName, QueryOperate queryOperate) {
+        if (!queryOperate.equals(QueryOperate.IS_NULL) && !queryOperate.equals(QueryOperate.IS_NOT_NULL)) {
+            throw new IllegalArgumentException("Constructor only support null reject logic!");
+        }
+        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
+        return this;
+    }
+
+    /**
+     * or with query node
+     *
+     * @param node
+     * @return
+     */
+    public QueryGroup or(QueryNode node) {
+        queryHandleList.add(node);
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
+        return this;
+    }
+
+
+    /**
+     * or with parameters and default operate `or`
+     *
+     * @param columnName column name
+     * @param value      value
+     * @return
+     */
+    public QueryGroup or(String columnName, Object value) {
+        queryHandleList.add(new QueryNode(columnName, value));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
+        return this;
+    }
+
+    /**
+     * or with parameters and operate
+     *
+     * @param columnName   column name
+     * @param value        value
+     * @param queryOperate query operate
+     * @return
+     */
+    public QueryGroup or(String columnName, Object value, QueryOperate queryOperate) {
+        queryHandleList.add(new QueryNode(columnName, value, queryOperate));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
+        return this;
+    }
+
+    /**
+     * null query node
+     *
+     * @param columnName
+     */
+    public QueryGroup or(String columnName, QueryOperate queryOperate) {
+        if (!queryOperate.equals(QueryOperate.IS_NULL) && !queryOperate.equals(QueryOperate.IS_NOT_NULL)) {
+            throw new IllegalArgumentException("Constructor only support null reject logic!");
+        }
+        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+        queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));
+        return this;
+    }
+
+    /**
+     * or with query group
+     *
+     * @param group query group
+     * @return
+     */
     public QueryGroup or(QueryGroup group) {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
@@ -94,6 +220,12 @@ public class QueryGroup {
         return this;
     }
 
+
+    /**
+     * @param column
+     * @param queryOrder
+     * @return
+     */
     public QueryGroup order(String column, QueryOrder queryOrder) {
         this.sortList.add(new QuerySort(column, queryOrder));
         return this;

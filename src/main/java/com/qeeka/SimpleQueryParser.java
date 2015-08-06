@@ -19,6 +19,10 @@ public class SimpleQueryParser {
         }
 
         SimpleQuery simpleQuery = new SimpleQuery();
+        if (nodeStack.size() == 1) {
+            simpleQuery.setHql(generateParameterHql(nodeStack.get(0), simpleQuery.getParameters()));
+            return simpleQuery;
+        }
 
         Stack<CharSequence> hqlParts = new Stack<>();
 
@@ -91,15 +95,19 @@ public class SimpleQueryParser {
 
             switch (node.getQueryOperate()) {
                 case IS_NULL:
-                    queryPart.append(" IS NULL ");
+                    queryPart.append(" IS NULL");
                     parameterName = null;
                     break;
                 case IS_NOT_NULL:
-                    queryPart.append(" IS NOT NULL ");
+                    queryPart.append(" IS NOT NULL");
                     parameterName = null;
                     break;
-                case COLUMN_COMPARE:
-                    queryPart.append(" = ").append(node.getValue());
+                case COLUMN_EQUALS:
+                    queryPart.append(node.getValue());
+                    parameterName = null;
+                    break;
+                case COLUMN_NO_EQUALS:
+                    queryPart.append(node.getValue());
                     parameterName = null;
                     break;
                 default:
