@@ -24,11 +24,6 @@ public class QueryGroup {
      */
     private Sort sort;
 
-    /**
-     * need return count
-     */
-    private boolean includeCount = true;
-
     public QueryGroup() {
     }
 
@@ -232,16 +227,6 @@ public class QueryGroup {
     }
 
 
-    /**
-     * Exclude count
-     *
-     * @return
-     */
-    public QueryGroup excludeCount() {
-        this.includeCount = false;
-        return this;
-    }
-
     public Sort getSort() {
         return sort;
     }
@@ -256,13 +241,5 @@ public class QueryGroup {
 
     public void setQueryHandleList(List<QueryHandle> queryHandleList) {
         this.queryHandleList = queryHandleList;
-    }
-
-    public Boolean getIncludeCount() {
-        return includeCount;
-    }
-
-    public void setIncludeCount(Boolean includeCount) {
-        this.includeCount = includeCount;
     }
 }

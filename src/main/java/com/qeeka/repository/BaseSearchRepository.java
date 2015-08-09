@@ -72,19 +72,22 @@ public abstract class BaseSearchRepository<T> {
         }
         logger.debug("Generate HQL : {}", hql.toString());
 
-        TypedQuery<T> recordQuery = entityManager.createQuery(hql.toString(), entityClass);
-        for (Map.Entry<String, Object> entry : query.getParameters().entrySet()) {
-            recordQuery.setParameter(entry.getKey(), entry.getValue());
-        }
-        //Page search , need page index and size
-        if (queryRequest.getPageIndex() != null && queryRequest.getPageSize() != null) {
-            recordQuery.setFirstResult(queryRequest.getPageIndex() * queryRequest.getPageSize());
-            recordQuery.setMaxResults(queryRequest.getPageSize());
-        }
-        //Set query record
-        QueryResponse<T> queryResponse = new QueryResponse<>();
-        queryResponse.setRecords(recordQuery.getResultList());
 
+        QueryResponse<T> queryResponse = new QueryResponse<>();
+
+        if (queryRequest.isNeedRecord()) {
+            TypedQuery<T> recordQuery = entityManager.createQuery(hql.toString(), entityClass);
+            for (Map.Entry<String, Object> entry : query.getParameters().entrySet()) {
+                recordQuery.setParameter(entry.getKey(), entry.getValue());
+            }
+            //Page search , need page index and size
+            if (queryRequest.getPageIndex() != null && queryRequest.getPageSize() != null) {
+                recordQuery.setFirstResult(queryRequest.getPageIndex() * queryRequest.getPageSize());
+                recordQuery.setMaxResults(queryRequest.getPageSize());
+            }
+            //Set query record
+            queryResponse.setRecords(recordQuery.getResultList());
+        }
         //Query total
         if (queryRequest.isNeedCount()) {
             StringBuilder countHql = new StringBuilder("SELECT COUNT(E) FROM ").append(entityName).append(" E ");
@@ -96,6 +99,7 @@ public abstract class BaseSearchRepository<T> {
                 countQuery.setParameter(entry.getKey(), entry.getValue());
             }
             Long total = countQuery.getSingleResult();
+            //Set query total
             queryResponse.setTotal(total);
         }
         return queryResponse;

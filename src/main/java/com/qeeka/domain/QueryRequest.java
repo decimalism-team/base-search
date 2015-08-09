@@ -14,10 +14,15 @@ public class QueryRequest {
 
     //page index
     private Integer pageIndex;
+
     //page size
     private Integer pageSize;
+
     //need total record
     private boolean needCount = true;
+
+    //only need count
+    private boolean needRecord = true;
 
     public QueryRequest() {
     }
@@ -74,5 +79,21 @@ public class QueryRequest {
 
     public void setNeedCount(boolean needCount) {
         this.needCount = needCount;
+    }
+
+    public boolean isNeedRecord() {
+        return needRecord;
+    }
+
+    public void setNeedRecord(boolean needRecord) {
+        this.needRecord = needRecord;
+    }
+
+    public QueryResultType getQueryResultType() {
+        return queryResultType;
+    }
+
+    public void setQueryResultType(QueryResultType queryResultType) {
+        this.queryResultType = queryResultType;
     }
 }
