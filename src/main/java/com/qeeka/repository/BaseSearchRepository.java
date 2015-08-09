@@ -1,15 +1,20 @@
 package com.qeeka.repository;
 
-import com.qeeka.SimpleQuery;
+import com.qeeka.domain.QueryModel;
+import com.qeeka.domain.QueryParser;
+import com.qeeka.domain.QueryRequest;
+import com.qeeka.domain.QueryResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 import org.springframework.core.GenericTypeResolver;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.lang.annotation.Annotation;
-import java.util.List;
 import java.util.Map;
 
 
@@ -17,11 +22,16 @@ import java.util.Map;
  * Created by Neal on 8/3 0003.
  */
 public abstract class BaseSearchRepository<T> {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @PersistenceContext
     protected EntityManager entityManager;
     //Get T  Real Class
     protected Class entityClass;
     protected String entityName;
+
+    //Init query parse class
+    private QueryParser queryParser = new QueryParser();
 
     public BaseSearchRepository() {
         Class<?>[] arguments = GenericTypeResolver.resolveTypeArguments(getClass(), BaseSearchRepository.class);
@@ -49,12 +59,45 @@ public abstract class BaseSearchRepository<T> {
         }
     }
 
-    public List<T> search(SimpleQuery query) {
-        StringBuilder hql = new StringBuilder("FROM ").append(entityName).append(" WHERE ").append(query.getHql());
-        TypedQuery<T> typedQuery = entityManager.createQuery(hql.toString(), entityClass);
-        for (Map.Entry<String, Object> entry : query.getParameters().entrySet()) {
-            typedQuery.setParameter(entry.getKey(), entry.getValue());
+    public QueryResponse<T> search(QueryRequest queryRequest) {
+        //parse query group to simple query domain
+        QueryModel query = queryParser.parse(queryRequest.getQueryGroup());
+
+        StringBuilder hql = new StringBuilder("FROM ").append(entityName);
+        if (StringUtils.hasText(query.getStatement())) {
+            hql.append(" WHERE ").append(query.getStatement());
         }
-        return typedQuery.getResultList();
+        if (StringUtils.hasText(query.getOrderStatement())) {
+            hql.append(" ORDER BY ").append(query.getOrderStatement());
+        }
+        logger.debug("Generate HQL : {}", hql.toString());
+
+        TypedQuery<T> recordQuery = entityManager.createQuery(hql.toString(), entityClass);
+        for (Map.Entry<String, Object> entry : query.getParameters().entrySet()) {
+            recordQuery.setParameter(entry.getKey(), entry.getValue());
+        }
+        //Page search , need page index and size
+        if (queryRequest.getPageIndex() != null && queryRequest.getPageSize() != null) {
+            recordQuery.setFirstResult(queryRequest.getPageIndex() * queryRequest.getPageSize());
+            recordQuery.setMaxResults(queryRequest.getPageSize());
+        }
+        //Set query record
+        QueryResponse<T> queryResponse = new QueryResponse<>();
+        queryResponse.setRecords(recordQuery.getResultList());
+
+        //Query total
+        if (queryRequest.isNeedCount()) {
+            StringBuilder countHql = new StringBuilder("SELECT COUNT(E) FROM ").append(entityName).append(" E ");
+            if (StringUtils.hasText(query.getStatement())) {
+                countHql.append(" WHERE ").append(query.getStatement());
+            }
+            TypedQuery<Long> countQuery = entityManager.createQuery(countHql.toString(), Long.class);
+            for (Map.Entry<String, Object> entry : query.getParameters().entrySet()) {
+                countQuery.setParameter(entry.getKey(), entry.getValue());
+            }
+            Long total = countQuery.getSingleResult();
+            queryResponse.setTotal(total);
+        }
+        return queryResponse;
     }
 }

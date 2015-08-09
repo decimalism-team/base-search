@@ -1,7 +1,8 @@
 package com.qeeka.test.service;
 
-import com.qeeka.QueryGroup;
-import com.qeeka.SimpleQueryParser;
+import com.qeeka.domain.QueryParser;
+import com.qeeka.domain.QueryRequest;
+import com.qeeka.domain.QueryResponse;
 import com.qeeka.test.domain.Person;
 import com.qeeka.test.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 
 /**
  * Created by Neal on 2015/7/27.
@@ -25,7 +25,7 @@ public class PersonService {
     private PersonRepository repository;
 
     @Autowired
-    private SimpleQueryParser queryParser;
+    private QueryParser queryParser;
 
 
     public void remove(int personId) {
@@ -34,7 +34,7 @@ public class PersonService {
     }
 
 
-    public List<Person> search(QueryGroup group) {
-        return repository.search(queryParser.parse(group));
+    public QueryResponse<Person> search(QueryRequest request) {
+        return repository.search(request);
     }
 }

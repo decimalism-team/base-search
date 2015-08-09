@@ -1,6 +1,6 @@
 package com.qeeka.test;
 
-import com.qeeka.SimpleQueryParser;
+import com.qeeka.domain.QueryParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -53,7 +53,7 @@ public class AppTestConfig {
     }
 
     @Bean
-    public SimpleQueryParser queryParser() {
-        return new SimpleQueryParser();
+    public QueryParser queryParser() {
+        return new QueryParser();
     }
 }

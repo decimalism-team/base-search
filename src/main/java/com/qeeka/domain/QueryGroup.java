@@ -1,11 +1,10 @@
-package com.qeeka;
+package com.qeeka.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.qeeka.deserializer.QueryGroupJsonDeserializer;
 import com.qeeka.operate.QueryLinkOperate;
 import com.qeeka.operate.QueryOperate;
-import com.qeeka.operate.QueryOrder;
-import com.qeeka.operate.QueryResultType;
+import com.qeeka.operate.Sort;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,13 +20,14 @@ public class QueryGroup {
      */
     private List<QueryHandle> queryHandleList = new LinkedList<>();
     /**
-     * query result type : List or Unique
-     */
-    private QueryResultType queryResultType = QueryResultType.LIST;
-    /**
      * query sort column
      */
-    private List<QuerySort> sortList = new LinkedList<>();
+    private Sort sort;
+
+    /**
+     * need return count
+     */
+    private boolean includeCount = true;
 
     public QueryGroup() {
     }
@@ -50,6 +50,17 @@ public class QueryGroup {
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
+    }
+
+    /**
+     * Sort
+     *
+     * @param sort
+     * @return
+     */
+    public QueryGroup sort(Sort sort) {
+        this.sort = sort;
+        return this;
     }
 
     /**
@@ -222,13 +233,21 @@ public class QueryGroup {
 
 
     /**
-     * @param column
-     * @param queryOrder
+     * Exclude count
+     *
      * @return
      */
-    public QueryGroup order(String column, QueryOrder queryOrder) {
-        this.sortList.add(new QuerySort(column, queryOrder));
+    public QueryGroup excludeCount() {
+        this.includeCount = false;
         return this;
+    }
+
+    public Sort getSort() {
+        return sort;
+    }
+
+    public void setSort(Sort sort) {
+        this.sort = sort;
     }
 
     public List<QueryHandle> getQueryHandleList() {
@@ -239,19 +258,11 @@ public class QueryGroup {
         this.queryHandleList = queryHandleList;
     }
 
-    public QueryResultType getQueryResultType() {
-        return queryResultType;
+    public Boolean getIncludeCount() {
+        return includeCount;
     }
 
-    public void setQueryResultType(QueryResultType queryResultType) {
-        this.queryResultType = queryResultType;
-    }
-
-    public List<QuerySort> getSortList() {
-        return sortList;
-    }
-
-    public void setSortList(List<QuerySort> sortList) {
-        this.sortList = sortList;
+    public void setIncludeCount(Boolean includeCount) {
+        this.includeCount = includeCount;
     }
 }

@@ -1,12 +1,11 @@
 package com.qeeka.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.qeeka.QueryGroup;
-import com.qeeka.QueryNode;
-import com.qeeka.QueryOperateNode;
+import com.qeeka.domain.QueryGroup;
+import com.qeeka.domain.QueryNode;
+import com.qeeka.domain.QueryOperateNode;
 import com.qeeka.operate.QueryLinkOperate;
 import com.qeeka.operate.QueryOperate;
 

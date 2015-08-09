@@ -1,11 +1,11 @@
-package com.qeeka;
+package com.qeeka.domain;
 
 import com.qeeka.operate.QueryOperate;
 
 /**
  * Created by neal.xu on 7/31 0031.
  */
-public class QueryNode extends QueryHandle {
+public class QueryNode implements QueryHandle {
     private String columnName;
     private Object value;
     private QueryOperate queryOperate = QueryOperate.EQUALS;

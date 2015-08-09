@@ -4,29 +4,21 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
-import com.qeeka.QueryGroup;
+import com.qeeka.domain.QueryGroup;
 import com.qeeka.deserializer.QueryGroupJsonDeserializer;
+import com.qeeka.domain.QueryRequest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-public class QueryJSONBinder<T> {
+public class QueryJSONBinder {
     static final ObjectMapper DEFAULT_OBJECT_MAPPER;
 
     static {
         DEFAULT_OBJECT_MAPPER = createMapper();
-    }
-
-    public static <T> QueryJSONBinder<T> binder(Class<T> beanClass) {
-        return new QueryJSONBinder<>(beanClass);
-    }
-
-    public static ObjectMapper getObjectMapper() {
-        return DEFAULT_OBJECT_MAPPER;
     }
 
     private static ObjectMapper createMapper() {
@@ -46,35 +38,20 @@ public class QueryJSONBinder<T> {
         return mapper;
     }
 
-    private final Class<T> beanClass;
-    ObjectMapper objectMapper;
-
-    private QueryJSONBinder(Class<T> beanClass) {
-        this.beanClass = beanClass;
-        this.objectMapper = DEFAULT_OBJECT_MAPPER;
-    }
-
-    public T fromJSON(String json) {
+    public static QueryRequest fromJSON(String json) {
         try {
-            return objectMapper.readValue(json, beanClass);
+            return DEFAULT_OBJECT_MAPPER.readValue(json, QueryRequest.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String toJSON(T object) {
+    public static String toJSON(QueryRequest request) {
         try {
-            return objectMapper.writeValueAsString(object);
+            return DEFAULT_OBJECT_MAPPER.writeValueAsString(request);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public QueryJSONBinder<T> indentOutput() {
-        if (DEFAULT_OBJECT_MAPPER.equals(objectMapper)) {
-            objectMapper = createMapper();
-        }
-        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        return this;
-    }
 }

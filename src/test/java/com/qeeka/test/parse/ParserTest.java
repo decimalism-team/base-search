@@ -1,42 +1,42 @@
 package com.qeeka.test.parse;
 
-import com.qeeka.QueryGroup;
-import com.qeeka.QueryNode;
-import com.qeeka.SimpleQuery;
-import com.qeeka.SimpleQueryParser;
+import com.qeeka.domain.*;
 import com.qeeka.operate.QueryOperate;
 import com.qeeka.util.QueryJSONBinder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by neal.xu on 7/31 0031.
  */
 public class ParserTest {
-    SimpleQueryParser parser;
+    QueryParser parser;
 
     @Before
     public void init() {
-        parser = new SimpleQueryParser();
+        parser = new QueryParser();
     }
 
     @Test
     public void sampleTest() {
         QueryGroup group = new QueryGroup("a", 1).and("b", 2).or("c", 3);
-        Assert.assertEquals(parser.parse(group).getHql(), "(c = :c2 OR (a = :a0 AND b = :b1)))");
+        Assert.assertEquals(parser.parse(group).getStatement(), "(c = :c2 OR (a = :a0 AND b = :b1)))");
     }
 
     @Test
     public void testSimpleEquals() {
         QueryGroup group = new QueryGroup(new QueryNode("a", 1)).and(new QueryNode("b", 2)).and("c", 3);
-        Assert.assertEquals(parser.parse(group).getHql(), "(c = :c2 AND (a = :a0 AND b = :b1)))");
+        Assert.assertEquals(parser.parse(group).getStatement(), "(c = :c2 AND (a = :a0 AND b = :b1)))");
     }
 
     @Test
     public void testLike() {
         QueryGroup group = new QueryGroup(new QueryNode("a", 1, QueryOperate.LIKE)).and(new QueryNode("b", 2, QueryOperate.NO_EQUALS));
-        Assert.assertEquals(parser.parse(group).getHql(), "(a LIKE :a0 AND b <> :b1)");
+        Assert.assertEquals(parser.parse(group).getStatement(), "(a LIKE :a0 AND b <> :b1)");
     }
 
     @Test
@@ -45,7 +45,7 @@ public class ParserTest {
                 and(
                         new QueryGroup(new QueryNode("c", 3)).and(new QueryNode("a", 1)).and(new QueryNode("b", 2))
                 );
-        Assert.assertEquals(parser.parse(group).getHql(), "(d = :d3 AND (b = :b2 AND (c = :c0 AND a = :a1)))))");
+        Assert.assertEquals(parser.parse(group).getStatement(), "(d = :d3 AND (b = :b2 AND (c = :c0 AND a = :a1)))))");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ParserTest {
         QueryGroup group = new QueryGroup("c", 5).or(
                 new QueryGroup("a", 3).and("b", 4).or("f", 9)
         );
-        Assert.assertEquals(parser.parse(group).getHql(), "(c = :c3 OR (f = :f2 OR (a = :a0 AND b = :b1)))))");
+        Assert.assertEquals(parser.parse(group).getStatement(), "(c = :c3 OR (f = :f2 OR (a = :a0 AND b = :b1)))))");
     }
 
     @Test
@@ -63,18 +63,18 @@ public class ParserTest {
         ).or(
                 new QueryGroup("c", 3).or("d", 5)
         );
-        Assert.assertEquals(parser.parse(group).getHql(), "((a = :a0 AND b = :b1) OR (c = :c2 OR d = :d3))");
+        Assert.assertEquals(parser.parse(group).getStatement(), "((a = :a0 AND b = :b1) OR (c = :c2 OR d = :d3))");
     }
 
     @Test
     public void testSimpleColumnParameters() {
         QueryGroup group = new QueryGroup("a", 30).and("b", 10).or("a", 20);
-        SimpleQuery simpleQuery = parser.parse(group);
-        Assert.assertEquals(simpleQuery.getHql(), "(a = :a2 OR (a = :a0 AND b = :b1)))");
-        Assert.assertTrue(simpleQuery.getParameters().size() == 3);
-        Assert.assertEquals(simpleQuery.getParameters().get("a0"), 30);
-        Assert.assertEquals(simpleQuery.getParameters().get("b1"), 10);
-        Assert.assertEquals(simpleQuery.getParameters().get("a2"), 20);
+        QueryModel queryModel = parser.parse(group);
+        Assert.assertEquals(queryModel.getStatement(), "(a = :a2 OR (a = :a0 AND b = :b1)))");
+        Assert.assertTrue(queryModel.getParameters().size() == 3);
+        Assert.assertEquals(queryModel.getParameters().get("a0"), 30);
+        Assert.assertEquals(queryModel.getParameters().get("b1"), 10);
+        Assert.assertEquals(queryModel.getParameters().get("a2"), 20);
     }
 
     @Test
@@ -85,8 +85,20 @@ public class ParserTest {
                 new QueryGroup("c", 3).or("d", 5)
         );
 
-        String s = QueryJSONBinder.binder(QueryGroup.class).toJSON(group);
-        QueryGroup queryGroup = QueryJSONBinder.binder(QueryGroup.class).fromJSON(s);
-        Assert.assertEquals(parser.parse(queryGroup).getHql(), "((a = :a0 AND b = :b1) OR (c = :c2 OR d = :d3))");
+        String s = QueryJSONBinder.toJSON(new QueryRequest(group));
+        QueryRequest request = QueryJSONBinder.fromJSON(s);
+        Assert.assertEquals(parser.parse(request.getQueryGroup()).getStatement(), "((a = :a0 AND b = :b1) OR (c = :c2 OR d = :d3))");
+    }
+
+    @Test
+    public void parametersTransaction() {
+        List<Integer> ids = Arrays.asList(1, 2, 3, 4);
+        QueryGroup group = new QueryGroup("id", ids, QueryOperate.IN).and("id", ids, QueryOperate.NOT_IN)
+                .and("name", "hello").or(
+                        new QueryGroup("key", 1)
+                );
+        String s = QueryJSONBinder.toJSON(new QueryRequest(group));
+        QueryRequest request = QueryJSONBinder.fromJSON(s);
+        Assert.assertEquals(parser.parse(request.getQueryGroup()).getStatement(), "(key = :key3 OR (name = :name2 AND (id IN (:id0) AND id NOT IN (:id1))))))");
     }
 }

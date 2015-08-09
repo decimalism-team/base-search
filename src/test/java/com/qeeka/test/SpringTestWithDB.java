@@ -1,8 +1,6 @@
 package com.qeeka.test;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -21,13 +19,4 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class})
 public class SpringTestWithDB {
-    @Before
-    public void init() {
-        System.out.println("begin");
-    }
-
-    @After
-    public void destroy() {
-        System.out.println("destroy");
-    }
 }
