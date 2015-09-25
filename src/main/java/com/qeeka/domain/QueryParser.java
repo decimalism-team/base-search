@@ -12,7 +12,8 @@ import java.util.Stack;
  */
 public class QueryParser {
 
-    public QueryModel parse(QueryGroup group) {
+    public QueryModel parse(QueryGroup queryGroup) {
+        QueryGroup group = deepQueryGroupCopy(queryGroup);
         QueryModel queryModel = new QueryModel();
         if (group == null) {
             return queryModel;
@@ -147,6 +148,10 @@ public class QueryParser {
                     queryPart.append(":").append(parameterName);
                     node.setValue(String.format("%%%s%%", node.getValue()));
                     break;
+                case SUB_QUERY:
+                    queryPart.append(node.getValue());
+                    parameterName = null;
+                    break;
                 default:
                     queryPart.append(":").append(parameterName);
             }
@@ -157,5 +162,28 @@ public class QueryParser {
             return queryPart.toString();
         }
         return "";
+    }
+
+    private QueryGroup deepQueryGroupCopy(QueryGroup queryGroup) {
+        //Copy Node
+        if (queryGroup != null) {
+            QueryGroup group = new QueryGroup();
+            if (queryGroup.getQueryHandleList() != null) {
+                for (QueryHandle handle : queryGroup.getQueryHandleList()) {
+                    if (handle instanceof QueryOperateNode) {
+                        QueryOperateNode operateNode = new QueryOperateNode(((QueryOperateNode) handle).getQueryLinkOperate());
+                        group.getQueryHandleList().add(operateNode);
+                    } else if (handle instanceof QueryNode) {
+                        QueryNode currentNode = (QueryNode) handle;
+                        QueryNode queryNode = new QueryNode(currentNode.getColumnName(), currentNode.getValue(), currentNode.getQueryOperate());
+                        group.getQueryHandleList().add(queryNode);
+                    }
+                }
+            }
+            group.setSort(queryGroup.getSort());
+            return group;
+        }else {
+            return null;
+        }
     }
 }
