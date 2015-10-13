@@ -17,9 +17,9 @@ public class BaseSearchResponse<T> {
     @XmlElement(name = "total_records")
     protected Long totalRecords;
     @XmlElement(name = "page_index")
-    protected int pageIndex;
+    protected Integer pageIndex;
     @XmlElement(name = "page_size")
-    protected int pageSize;
+    protected Integer pageSize;
     @XmlElement(name = "message")
     private String message;
 
@@ -47,19 +47,19 @@ public class BaseSearchResponse<T> {
         this.totalRecords = totalRecords;
     }
 
-    public int getPageIndex() {
+    public Integer getPageIndex() {
         return pageIndex;
     }
 
-    public void setPageIndex(int pageIndex) {
+    public void setPageIndex(Integer pageIndex) {
         this.pageIndex = pageIndex;
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
 
