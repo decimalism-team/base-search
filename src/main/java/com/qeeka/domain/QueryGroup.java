@@ -97,7 +97,7 @@ public class QueryGroup {
         if (QueryOperate.SUB_QUERY.equals(queryOperate)) {
             queryHandleList.add(new QueryNode("", columnName, queryOperate));
         } else {
-        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+            queryHandleList.add(new QueryNode(columnName, null, queryOperate));
         }
     }
 
@@ -180,7 +180,7 @@ public class QueryGroup {
         if (QueryOperate.SUB_QUERY.equals(queryOperate)) {
             queryHandleList.add(new QueryNode("", columnName, queryOperate));
         } else {
-        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+            queryHandleList.add(new QueryNode(columnName, null, queryOperate));
         }
         if (queryHandleList.size() > 1)
             queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
@@ -248,7 +248,7 @@ public class QueryGroup {
         if (QueryOperate.SUB_QUERY.equals(queryOperate)) {
             queryHandleList.add(new QueryNode("", columnName, queryOperate));
         } else {
-        queryHandleList.add(new QueryNode(columnName, null, queryOperate));
+            queryHandleList.add(new QueryNode(columnName, null, queryOperate));
         }
         if (queryHandleList.size() > 1)
             queryHandleList.add(new QueryOperateNode(QueryLinkOperate.OR));

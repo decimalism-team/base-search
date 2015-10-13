@@ -304,7 +304,7 @@ public abstract class BaseSearchRepository<T> {
         try {
             T entity = get(id);
             if (entity != null) {
-            entityManager.remove(entity);
+                entityManager.remove(entity);
             }
         } finally {
             logger.debug("delete, entityClass={},id={}, elapsedTime={}", entityClass.getName(), id, watch.elapsedTime());
