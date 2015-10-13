@@ -14,7 +14,7 @@ public class BaseSearchResponse<T> {
     @XmlElementWrapper(name = "record_list")
     @XmlElement(name = "record")
     protected List<T> recordList;
-    @XmlElement(name = "total_record")
+    @XmlElement(name = "total_records")
     protected Long totalRecords;
     @XmlElement(name = "page_index")
     protected int pageIndex;
