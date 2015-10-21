@@ -35,7 +35,7 @@ public abstract class BaseSearchRepository<T> {
     protected String entityName;
 
     //Init query parse class
-    private QueryParser queryParser = new QueryParser();
+    private final QueryParser queryParser = new QueryParser();
 
     /**
      * constructor and init class properties
@@ -113,12 +113,12 @@ public abstract class BaseSearchRepository<T> {
             recordQuery.setParameter(entry.getKey(), entry.getValue());
         }
         recordQuery.setMaxResults(1);
-        if (QueryResultType.SINGLE.equals(queryResultType)) {
+        if (QueryResultType.UNIQUE.equals(queryResultType)) {
             List<T> resultList = recordQuery.getResultList();
             if (resultList != null && !resultList.isEmpty()) {
                 queryResponse.setEntity(resultList.get(0));
             }
-        } else if (QueryResultType.UNIQUE.equals(queryResultType)) {
+        } else if (QueryResultType.SINGLE.equals(queryResultType)) {
             queryResponse.setEntity(recordQuery.getSingleResult());
         }
         return queryResponse;
@@ -519,7 +519,11 @@ public abstract class BaseSearchRepository<T> {
      * @return
      */
     public <X> List<X> findByNativeQuery(CharSequence sql) {
-        return findByNativeQuery(sql, null);
+        return findByNativeQuery(sql, null, null, null, null);
+    }
+
+    public <X> List<X> findByNativeQuery(CharSequence sql, Class<X> resultClass) {
+        return findByNativeQuery(sql, null, null, null, resultClass);
     }
 
     /**
@@ -530,7 +534,11 @@ public abstract class BaseSearchRepository<T> {
      * @return
      */
     public <X> List<X> findByNativeQuery(CharSequence sql, Map<String, Object> params) {
-        return findByNativeQuery(sql, params, null, null);
+        return findByNativeQuery(sql, params, null, null, null);
+    }
+
+    public <X> List<X> findByNativeQuery(CharSequence sql, Map<String, Object> params, Class<X> resultClass) {
+        return findByNativeQuery(sql, params, null, null, resultClass);
     }
 
     /**
@@ -542,7 +550,11 @@ public abstract class BaseSearchRepository<T> {
      * @return
      */
     public <X> List<X> findByNativeQuery(CharSequence sql, int offset, int size) {
-        return findByNativeQuery(sql, null, offset, size);
+        return findByNativeQuery(sql, null, offset, size, null);
+    }
+
+    public <X> List<X> findByNativeQuery(CharSequence sql, int offset, int size, Class<X> resultClass) {
+        return findByNativeQuery(sql, null, offset, size, resultClass);
     }
 
     /**
@@ -554,10 +566,15 @@ public abstract class BaseSearchRepository<T> {
      * @param size
      * @return
      */
-    public <X> List<X> findByNativeQuery(CharSequence sql, Map<String, Object> params, Integer offset, Integer size) {
+    public <X> List<X> findByNativeQuery(CharSequence sql, Map<String, Object> params, Integer offset, Integer size, Class<X> resultClass) {
         StopWatch watch = new StopWatch();
         try {
-            Query namedQuery = entityManager.createNativeQuery(sql.toString());
+            Query namedQuery;
+            if (resultClass == null) {
+                namedQuery = entityManager.createNativeQuery(sql.toString(), entityClass);
+            } else {
+                namedQuery = entityManager.createNativeQuery(sql.toString());
+            }
             if (params != null) {
                 for (Map.Entry<String, Object> entry : params.entrySet()) {
                     namedQuery.setParameter(entry.getKey(), entry.getValue());
