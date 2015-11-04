@@ -6,6 +6,7 @@ import com.qeeka.operate.QueryLinkOperate;
 import com.qeeka.operate.QueryOperate;
 import com.qeeka.operate.Sort;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class QueryGroup {
     /**
      * query handle node list
      */
-    private List<QueryHandle> queryHandleList = new LinkedList<>();
+    private final List<QueryHandle> queryHandleList = new LinkedList<>();
     /**
      * query sort column
      */
@@ -29,7 +30,7 @@ public class QueryGroup {
     /**
      * join other entity
      */
-    private Map<String, String> entityMapping = new LinkedHashMap<>();
+    private final Map<String, Map<QueryLinkOperate, String>> entityMapping = new LinkedHashMap<>();
 
     public QueryGroup() {
     }
@@ -166,10 +167,11 @@ public class QueryGroup {
         if (group == null) {
             throw new IllegalArgumentException("query can't null!");
         }
+        boolean beginHandel = !queryHandleList.isEmpty();
         for (QueryHandle handle : group.getQueryHandleList()) {
             queryHandleList.add(handle);
         }
-        if (!group.getQueryHandleList().isEmpty()) {
+        if (beginHandel && !group.getQueryHandleList().isEmpty()) {
             queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         }
         return this;
@@ -306,7 +308,21 @@ public class QueryGroup {
     //------------------ Join ------------------
 
     /**
-     * join other entity with alias ,  Default return entity (E) and Can't Modify ,
+     * inner join fetch other entity with alias ,  Default return entity (E) and Can't Modify ,
+     * Because BaseSearchRepository need return current <T> class.
+     *
+     * @param entityName
+     * @param entityAlias
+     * @return
+     */
+    public QueryGroup joinFetch(String entityName, String entityAlias) {
+        joinEntityCheck(entityName, entityAlias, QueryLinkOperate.CROSS_JOIN, null);
+        this.entityMapping.put(entityName, Collections.singletonMap(QueryLinkOperate.INNER_JOIN_FETCH, entityAlias));
+        return this;
+    }
+
+    /**
+     * inner join other entity with alias ,  Default return entity (E) and Can't Modify ,
      * Because BaseSearchRepository need return current <T> class.
      *
      * @param entityName
@@ -314,14 +330,79 @@ public class QueryGroup {
      * @return
      */
     public QueryGroup join(String entityName, String entityAlias) {
+        joinEntityCheck(entityName, entityAlias, QueryLinkOperate.CROSS_JOIN, null);
+        this.entityMapping.put(entityName, Collections.singletonMap(QueryLinkOperate.INNER_JOIN, entityAlias));
+        return this;
+    }
+
+    /**
+     * cross join other entity with alias ,  Default return entity (E) and Can't Modify , Only use to no relation Entity
+     * Because BaseSearchRepository need return current <T> class.
+     *
+     * @param entityName
+     * @param entityAlias
+     * @return
+     */
+    public QueryGroup crossJoin(String entityName, String entityAlias) {
+        joinEntityCheck(entityName, entityAlias, null, QueryLinkOperate.CROSS_JOIN);
+        this.entityMapping.put(entityName, Collections.singletonMap(QueryLinkOperate.CROSS_JOIN, entityAlias));
+        return this;
+    }
+
+    /**
+     * left join other entity with alias ,  Default return entity (E) and Can't Modify ,
+     * Because BaseSearchRepository need return current <T> class.
+     *
+     * @param entityName
+     * @param entityAlias
+     * @return
+     */
+    public QueryGroup leftJoin(String entityName, String entityAlias) {
+        joinEntityCheck(entityName, entityAlias, QueryLinkOperate.CROSS_JOIN, null);
+        this.entityMapping.put(entityName, Collections.singletonMap(QueryLinkOperate.LEFT_JOIN, entityAlias));
+        return this;
+    }
+
+    /**
+     * left join fetch other entity with alias ,  Default return entity (E) and Can't Modify ,
+     * Because BaseSearchRepository need return current <T> class.
+     *
+     * @param entityName
+     * @param entityAlias
+     * @return
+     */
+    public QueryGroup leftJoinFetch(String entityName, String entityAlias) {
+        joinEntityCheck(entityName, entityAlias, QueryLinkOperate.CROSS_JOIN, null);
+        this.entityMapping.put(entityName, Collections.singletonMap(QueryLinkOperate.LEFT_JOIN_FETCH, entityAlias));
+        return this;
+    }
+
+    private void joinEntityCheck(String entityName, String entityAlias, QueryLinkOperate excludeOperate, QueryLinkOperate aloneOperate) {
         if ("E".equalsIgnoreCase(entityAlias)) {
             throw new IllegalArgumentException("Can't use `E`  assign to entity!");
         }
-        if (entityAlias.equalsIgnoreCase(this.entityMapping.get(entityName))) {
-            throw new IllegalArgumentException("Join entity mapping already exist! Please fix #" + entityName);
+        Map<QueryLinkOperate, String> operateStringMap = this.entityMapping.get(entityName);
+        if (operateStringMap != null) {
+            throw new IllegalArgumentException("Entity already exist! Please fix #" + entityName);
         }
-        this.entityMapping.put(entityName, entityAlias);
-        return this;
+        if (excludeOperate != null) {
+            for (Map<QueryLinkOperate, String> queryLinkOperateStringMap : entityMapping.values()) {
+                for (QueryLinkOperate queryLinkOperate : queryLinkOperateStringMap.keySet()) {
+                    if (queryLinkOperate.equals(excludeOperate)) {
+                        throw new IllegalArgumentException("join operate can't support other query link operate! #" + excludeOperate.getValue());
+                    }
+                }
+            }
+        }
+        if (aloneOperate != null) {
+            for (Map<QueryLinkOperate, String> queryLinkOperateStringMap : entityMapping.values()) {
+                for (QueryLinkOperate queryLinkOperate : queryLinkOperateStringMap.keySet()) {
+                    if (!queryLinkOperate.equals(aloneOperate)) {
+                        throw new IllegalArgumentException("join operate only support query link operate! #" + aloneOperate.getValue());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -333,25 +414,25 @@ public class QueryGroup {
      * @return
      */
     public QueryGroup on(String masterColumn, String otherColumn) {
+        if (entityMapping.isEmpty()) {
+            throw new IllegalArgumentException("on must after join operator!");
+        }
+        for (Map<QueryLinkOperate, String> queryLinkOperateStringMap : entityMapping.values()) {
+            if (!queryLinkOperateStringMap.keySet().contains(QueryLinkOperate.CROSS_JOIN)) {
+                throw new IllegalArgumentException("on operator only support cross join!");
+            }
+        }
         queryHandleList.add(new QueryNode(masterColumn, otherColumn, QueryOperate.COLUMN_EQUALS));
         if (queryHandleList.size() > 1)
             queryHandleList.add(new QueryOperateNode(QueryLinkOperate.AND));
         return this;
     }
 
-    public Map<String, String> getEntityMapping() {
+    public Map<String, Map<QueryLinkOperate, String>> getEntityMapping() {
         return entityMapping;
-    }
-
-    public void setEntityMapping(Map<String, String> entityMapping) {
-        this.entityMapping = entityMapping;
     }
 
     public List<QueryHandle> getQueryHandleList() {
         return queryHandleList;
-    }
-
-    public void setQueryHandleList(List<QueryHandle> queryHandleList) {
-        this.queryHandleList = queryHandleList;
     }
 }

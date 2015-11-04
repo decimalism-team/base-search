@@ -3,6 +3,10 @@ package com.qeeka.test.parse;
 import com.qeeka.domain.QueryGroup;
 import com.qeeka.domain.QueryModel;
 import com.qeeka.domain.QueryParser;
+import com.qeeka.operate.Direction;
+import com.qeeka.operate.QueryOperate;
+import com.qeeka.operate.Sort;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -133,8 +137,70 @@ public class OperatorTest {
     }
 
     @Test
-    public void testJoin() {
-        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).join("OtherEntity", "O").on("O.id", "E.id");
+    public void testCrossJoin() {
+        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).crossJoin("OtherEntity", "O").on("O.id", "E.id");
         assertEquals(parser.parse(group).getStatement(), "((E.a = :E_a0 OR E.b = :E_b1) AND O.id = E.id)");
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCrossJoinAndInner() {
+        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).join("OtherEntity2", "O2").crossJoin("OtherEntity", "O");
+        assertEquals(parser.parse(group).getStatement(), "(E.a = :E_a0 OR E.b = :E_b1)");
+    }
+
+    @Test
+    public void testInnerJoin() {
+        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).join("OtherEntity", "O");
+        assertEquals(parser.parse(group).getStatement(), "(E.a = :E_a0 OR E.b = :E_b1)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInnerJoinCross() {
+        QueryGroup group = new QueryGroup("E.a", 1).join("OtherEntity", "O").on("O.id", "E.id").crossJoin("CrossEntity", "CE");
+        assertEquals(parser.parse(group).getStatement(), "(E.a = :E_a0 OR E.b = :E_b1)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testLeftJoin() {
+        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).leftJoin("OtherEntity", "O").on("O.id", "E.id");
+        assertEquals(parser.parse(group).getStatement(), "(E.a = :E_a0 OR E.b = :E_b1)");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testLeftJoinCrossJoin() {
+        QueryGroup group = new QueryGroup("E.a", 1).or("E.b", 2).leftJoin("OtherEntity", "O").on("O.id", "E.id").crossJoin("CrossEntity", "CE");
+        assertEquals(parser.parse(group).getStatement(), "(E.a = :E_a0 OR E.b = :E_b1)");
+    }
+
+    @Test
+    public void testGroupGroup() {
+        Integer status = null;
+        String title = null;
+        QueryGroup queryGroup = new QueryGroup()
+                .join("IconChannelVersionMappingEntity", "IE")
+                .and("E.status", status)
+                .and(new QueryGroup("E.platform", 3).or("E.platform", "all"))
+                .and(new QueryGroup("IE.channelCode", 4).or("IE.channelCode", "all"))
+                .and(new QueryGroup("IE.appVersion", 5).or("IE.appVersion", "all"));
+        queryGroup.and("E.title", "%" + title + "%", QueryOperate.LIKE);
+        queryGroup.sort(new Sort(Direction.ASC, "E.sequenceNumber"));
+        Assert.assertEquals(parser.parse(queryGroup).getStatement(), "((((E.platform = :E_platform0 OR E.platform = :E_platform1) AND (IE.channelCode = :IE_channelCode2 OR IE.channelCode = :IE_channelCode3)) AND (IE.appVersion = :IE_appVersion4 OR IE.appVersion = :IE_appVersion5)) AND E.title LIKE :E_title6)");
+    }
+
+
+    @Test
+    public void testGroupGroup2() {
+        Integer status = null;
+        String title = null;
+        QueryGroup queryGroup = new QueryGroup()
+                .join("IconChannelVersionMappingEntity", "IE")
+                .and("E.status", status)
+                .and(new QueryGroup("E.platform", status).or("E.platform", status))
+                .and(new QueryGroup("IE.channelCode", status).or("IE.channelCode", status))
+                .and(new QueryGroup("IE.appVersion", status).or("IE.appVersion", status));
+        queryGroup.and("E.title", title, QueryOperate.LIKE);
+        queryGroup.sort(new Sort(Direction.ASC, "E.sequenceNumber"));
+        Assert.assertNull(parser.parse(queryGroup).getStatement());
     }
 }
