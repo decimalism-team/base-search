@@ -60,7 +60,6 @@ public class QueryResponse<T> {
         if (response != null) {
             response.setEntity(this.entity);
             response.setRecordList(this.records);
-            response.setRecordMap(getObjectMap(this.getRecords()));
             response.setTotalRecords(this.totalRecords);
             response.setPageIndex(this.pageIndex);
             response.setPageSize(this.pageSize);
