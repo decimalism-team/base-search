@@ -102,4 +102,12 @@ public class BaseSearchResponse<T> {
             this.setPageSize(request.getPageSize());
         }
     }
+
+    public void acquireFromQueryResponse(QueryResponse request) {
+        if (request != null) {
+            this.setTotalRecords(request.getTotalRecords());
+            this.setPageIndex(request.getPageIndex());
+            this.setPageSize(request.getPageSize());
+        }
+    }
 }
