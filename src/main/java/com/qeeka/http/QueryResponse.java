@@ -68,7 +68,7 @@ public class QueryResponse<T> {
         return null;
     }
 
-    public Map<Object, T> getObjectMap() {
+    public Map<Object, T> getRecordsMap() {
         Map<Object, T> recordMap = new HashMap<>();
         if (this.records != null && !this.records.isEmpty() && this.records.get(0) instanceof MapHandle) {
             for (T result : this.records) {

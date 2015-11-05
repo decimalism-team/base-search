@@ -15,7 +15,7 @@ import java.util.List;
 public class BaseSearchResponse<T> {
     @XmlElement(name = "record")
     protected T entity;
-    @XmlElementWrapper(name = "record_list")
+    @XmlElementWrapper(name = "records")
     @XmlElement
     protected List<T> recordList;
     @XmlElement(name = "total_records")

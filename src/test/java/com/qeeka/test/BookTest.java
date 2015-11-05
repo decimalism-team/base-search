@@ -207,9 +207,21 @@ public class BookTest extends SpringTestWithDB {
     public void testBookMap() {
         BaseSearchRequest request = new BaseSearchRequest(0, 5);
         QueryResponse<Book> response = bookService.search(new QueryRequest(new QueryGroup()).needCount().setSearchRequest(request));
-        Map<Object, Book> recordMap = response.getObjectMap();
+        Map<Object, Book> recordMap = response.getRecordsMap();
         Assert.assertTrue(recordMap.size() == 3);
         Assert.assertTrue(recordMap.containsKey(0) && recordMap.containsKey(1) && recordMap.containsKey(3));
+    }
+
+    @Test
+    @DatabaseSetup("/BookData.xml")
+    public void testBookMapWithParam() {
+        BaseSearchRequest request = new BaseSearchRequest(0, 5);
+        List<Integer> ids = Arrays.asList(1, 3);
+        QueryGroup group = new QueryGroup("id", ids, QueryOperate.IN);
+        QueryResponse<Book> queryResponse = bookService.search(new QueryRequest(group).needCount().setSearchRequest(request));
+        Map<Object, Book> recordMap = queryResponse.getRecordsMap();
+        Assert.assertTrue(recordMap.size() == 2);
+        Assert.assertTrue(recordMap.containsKey(1) && recordMap.containsKey(3) && !recordMap.containsKey(0));
     }
 
     @Test
