@@ -68,10 +68,10 @@ public class QueryResponse<T> {
         return null;
     }
 
-    private Map<Object, T> getObjectMap(List<T> results) {
+    public Map<Object, T> getObjectMap() {
         Map<Object, T> recordMap = new HashMap<>();
-        if (!results.isEmpty() && results.get(0) instanceof MapHandle) {
-            for (T result : results) {
+        if (this.records != null && !this.records.isEmpty() && this.records.get(0) instanceof MapHandle) {
+            for (T result : this.records) {
                 recordMap.put(((MapHandle) result).getPrimaryKey(), result);
             }
         }
